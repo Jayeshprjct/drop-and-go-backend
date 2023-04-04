@@ -1,0 +1,19 @@
+spring:
+  profiles:
+    active:
+      - local
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+
+    show-sql:
+      true
+
+  servlet:
+    multipart:
+      enabled: true
+      max-request-size:
+        230MB
+      max-file-size:
+        200MB

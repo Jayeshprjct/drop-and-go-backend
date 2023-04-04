@@ -1,0 +1,10 @@
+spring:
+  config:
+    activate:
+      on-profile:
+        - local
+  datasource:
+    username: root
+    password: root
+    url: jdbc:mysql://localhost:3306/drop_and_go
+    driver-class-name: com.mysql.cj.jdbc.Driver
