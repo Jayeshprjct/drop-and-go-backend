@@ -8,19 +8,19 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @EnableWebMvc
 @Configuration
 public class WebSecurityConfiguration implements WebMvcConfigurer {
-    @Override
-    public void addCorsMappings(CorsRegistry registry) {
-        registry.addMapping("/**")
-                .allowedMethods("*")
-                .allowedOrigins(
-                        "http://192.168.1.107:3000",
-                        "http://localhost:3000"
-                )
-                .allowedHeaders("*")
-                .exposedHeaders(
-                        "Access-Control-Allow-Origin",
-                        "Access-Control-Allow-Credentials")
-                .allowCredentials(false).maxAge(3600);
-    }
+        @Override
+        public void addCorsMappings(CorsRegistry registry) {
+                registry.addMapping("/**")
+                                .allowedMethods("*")
+                                .allowedOrigins(
+                                                "http://192.168.1.107:3000",
+                                                "http://localhost:3000",
+                                                "http://127.0.0.1:5173/")
+                                .allowedHeaders("*")
+                                .exposedHeaders(
+                                                "Access-Control-Allow-Origin",
+                                                "Access-Control-Allow-Credentials")
+                                .allowCredentials(false).maxAge(3600);
+        }
 
 }
