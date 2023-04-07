@@ -40,16 +40,19 @@ public class FilesController {
     private AccountRepository accountRepository;
 
     @PostMapping("/file/upload")
+    @CrossOrigin(methods = {RequestMethod.POST, RequestMethod.OPTIONS}, allowedHeaders = {"Content-Type", "X-Requested-With", "accept", "Origin", "Access-Control-Request-Method", "Access-Control-Request-Headers"}, exposedHeaders = {"Access-Control-Allow-Origin", "Access-Control-Allow-Credentials"})
     public FileUploadResponse uploadFileUsingMultipart(
             @RequestParam("file") MultipartFile file,
             @RequestParam("fileName") String fileName,
             @RequestParam("isPrivate") Boolean isPrivate,
-            @RequestParam("filePassword") String filePassword,
+            @RequestParam(value = "filePassword", required = false) String filePassword,
             @RequestHeader("email") String email,
             @RequestHeader("password") String password
     ) throws UnauthorizedAccessException, IOException, LoginFailedException {
         if (email != null && password != null && accountService.verifyUser(email, password)) {
-
+            if (isPrivate && filePassword == null) {
+                throw new LoginFailedException("Incomplete details!");
+            }
             String uploadedBy = accountService.getUserNameByEmail(email);
 
             DropAndGoFile uploadedFile = filesService.uploadFileWithDetails(file, fileName, isPrivate, filePassword, uploadedBy);
@@ -80,7 +83,7 @@ public class FilesController {
         InputStream fileStream = fileService.getInputStreamUsingPath(fileName);
 
         Optional<User> optionalFileDownloader = accountRepository.findByEmail(fileDownloaderEmail);
-        if(optionalFileDownloader.isPresent()) {
+        if (optionalFileDownloader.isPresent()) {
             User fileDownloader = optionalFileDownloader.get();
             fileDownloader.setFilesDownloaded(fileDownloader.getFilesDownloaded() + 1);
             accountRepository.save(fileDownloader);
