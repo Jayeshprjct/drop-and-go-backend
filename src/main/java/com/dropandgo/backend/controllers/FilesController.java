@@ -8,6 +8,7 @@ import com.dropandgo.backend.exceptions.UnauthorizedAccessException;
 import com.dropandgo.backend.repository.AccountRepository;
 import com.dropandgo.backend.responses.FileDeleteResponse;
 import com.dropandgo.backend.responses.FileUploadResponse;
+import com.dropandgo.backend.responses.FileVerifyResponse;
 import com.dropandgo.backend.services.AccountService;
 import com.dropandgo.backend.services.FileService;
 import com.dropandgo.backend.services.FilesService;
@@ -97,6 +98,17 @@ public class FilesController {
                 .header(HttpHeaders.CONTENT_DISPOSITION, "file; filename=\"" + file.getDisplayName() + "\"")
                 .body(new InputStreamResource(fileStream));
 
+    }
+
+    @GetMapping("/file/verify")
+    public FileVerifyResponse verifyFileRequestUsingName(@RequestParam("fileName") String name) throws FileNotFoundException {
+        DropAndGoFile requestedFile = filesService.getFileDetailsByName(name);
+        return new FileVerifyResponse(
+                HttpStatus.OK,
+                requestedFile,
+                "Request file exists in the database",
+                AccountConstant.getTime()
+        );
     }
 
     @DeleteMapping("/file/delete")
