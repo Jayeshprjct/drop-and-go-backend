@@ -6,10 +6,12 @@ import com.dropandgo.backend.entity.User;
 import com.dropandgo.backend.exceptions.LoginFailedException;
 import com.dropandgo.backend.exceptions.UnauthorizedAccessException;
 import com.dropandgo.backend.repository.AccountRepository;
+import com.dropandgo.backend.repository.AdminRepository;
 import com.dropandgo.backend.responses.FileDeleteResponse;
 import com.dropandgo.backend.responses.FileUploadResponse;
 import com.dropandgo.backend.responses.FileVerifyResponse;
 import com.dropandgo.backend.services.AccountService;
+import com.dropandgo.backend.services.AdminService;
 import com.dropandgo.backend.services.FileService;
 import com.dropandgo.backend.services.FilesService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,6 +41,10 @@ public class FilesController {
     private AccountService accountService;
     @Autowired
     private AccountRepository accountRepository;
+    @Autowired
+    private AdminService adminService;
+    @Autowired
+    private AdminRepository adminRepository;
 
     @PostMapping("/file/upload")
     @CrossOrigin(methods = {RequestMethod.POST, RequestMethod.OPTIONS}, allowedHeaders = {"Content-Type", "X-Requested-With", "accept", "Origin", "Access-Control-Request-Method", "Access-Control-Request-Headers"}, exposedHeaders = {"Access-Control-Allow-Origin", "Access-Control-Allow-Credentials"})
@@ -101,14 +107,17 @@ public class FilesController {
     }
 
     @GetMapping("/file/verify")
-    public FileVerifyResponse verifyFileRequestUsingName(@RequestParam("fileName") String name) throws FileNotFoundException {
-        DropAndGoFile requestedFile = filesService.getFileDetailsByName(name);
-        return new FileVerifyResponse(
-                HttpStatus.OK,
-                requestedFile,
-                "Request file exists in the database",
-                AccountConstant.getTime()
-        );
+    public FileVerifyResponse verifyFileRequestUsingName(@RequestParam("fileName") String name, @RequestHeader("adminId") String adminId, @RequestHeader("adminPassword") String adminPassword) throws FileNotFoundException, UnauthorizedAccessException {
+        if (adminService.isAdmin(adminId, adminPassword)) {
+            DropAndGoFile requestedFile = filesService.getFileDetailsByName(name);
+            return new FileVerifyResponse(
+                    HttpStatus.OK,
+                    requestedFile,
+                    "Request file exists in the database",
+                    AccountConstant.getTime()
+            );
+        }
+        throw new UnauthorizedAccessException("Unauthorized to verify file!");
     }
 
     @DeleteMapping("/file/delete")
