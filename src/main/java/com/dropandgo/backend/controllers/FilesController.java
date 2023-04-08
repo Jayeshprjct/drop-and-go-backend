@@ -122,8 +122,9 @@ public class FilesController {
     }
 
     @GetMapping("/account/uploadedFiles")
-    public List<DropAndGoFile> getUploadedFilesOfUserByName(@RequestParam("username") String username, @RequestHeader("adminId") String adminId, @RequestHeader("adminPassword") String adminPassword) throws UnauthorizedAccessException {
+    public List<DropAndGoFile> getUploadedFilesOfUserByName(@RequestParam("email") String email, @RequestHeader("adminId") String adminId, @RequestHeader("adminPassword") String adminPassword) throws UnauthorizedAccessException, LoginFailedException {
         if (adminService.isAdmin(adminId, adminPassword)) {
+            String username = accountService.getUserNameByEmail(email);
             List<DropAndGoFile> files = filesService.getFilesByUsername(username);
             return files;
         }
