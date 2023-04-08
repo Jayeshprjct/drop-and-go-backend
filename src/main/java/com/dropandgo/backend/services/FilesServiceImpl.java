@@ -1,6 +1,5 @@
 package com.dropandgo.backend.services;
 
-import com.dropandgo.backend.constants.FileConstant;
 import com.dropandgo.backend.entity.DropAndGoFile;
 import com.dropandgo.backend.entity.User;
 import com.dropandgo.backend.exceptions.UnauthorizedAccessException;
@@ -10,10 +9,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -34,7 +32,7 @@ public class FilesServiceImpl implements FilesService {
         uploadedFile.setFilePassword(filePassword);
 
         Optional<User> optionalFileUploader = accountRepository.findByName(username);
-        if(optionalFileUploader.isPresent()) {
+        if (optionalFileUploader.isPresent()) {
             User fileUploader = optionalFileUploader.get();
             fileUploader.setFilesUploaded(fileUploader.getFilesUploaded() + 1);
             accountRepository.save(fileUploader);
@@ -52,7 +50,7 @@ public class FilesServiceImpl implements FilesService {
 
     @Override
     public DropAndGoFile deleteFile(DropAndGoFile file) throws Exception {
-        if(fileService.deleteFile(file.getActualName())) {
+        if (fileService.deleteFile(file.getActualName())) {
             filesRepository.delete(file);
             return file;
         }
@@ -61,9 +59,14 @@ public class FilesServiceImpl implements FilesService {
 
     @Override
     public boolean verifyPassword(DropAndGoFile requestedFile, String filePassword) throws UnauthorizedAccessException {
-        if(requestedFile.getFilePassword().equals(filePassword)) {
+        if (requestedFile.getFilePassword().equals(filePassword)) {
             return true;
         }
         throw new UnauthorizedAccessException("Incorrect file password");
+    }
+
+    @Override
+    public List<DropAndGoFile> getFilesByUsername(String username) {
+        return filesRepository.findByUploadedBy(username);
     }
 }

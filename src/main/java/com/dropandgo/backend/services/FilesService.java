@@ -7,6 +7,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 
 public interface FilesService {
 
@@ -17,4 +18,6 @@ public interface FilesService {
     DropAndGoFile deleteFile(DropAndGoFile file) throws Exception;
 
     boolean verifyPassword(DropAndGoFile requestedFile, String filePassword) throws UnauthorizedAccessException;
+
+    List<DropAndGoFile> getFilesByUsername(String username);
 }

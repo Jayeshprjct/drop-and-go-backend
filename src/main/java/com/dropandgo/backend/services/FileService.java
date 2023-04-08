@@ -50,6 +50,7 @@ public class FileService {
                 .builder()
                 .fileType(file.getContentType())
                 .displayName(fileName + extension)
+                .fileSize(file.getSize())
                 .actualName(usableName)
                 .path(FileConstant.filePath)
                 .uploadedOn(timeStamp)
@@ -66,7 +67,7 @@ public class FileService {
     public Boolean deleteFile(String actualName) throws FileNotFoundException {
         String fullPath = FileConstant.filePath + actualName;
         File file = new File(FileConstant.filePath);
-        if(file.exists()) {
+        if (file.exists()) {
             File f = new File(file, actualName);
             return f.delete();
         }

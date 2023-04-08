@@ -27,6 +27,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -47,7 +48,7 @@ public class FilesController {
     private AdminRepository adminRepository;
 
     @PostMapping("/file/upload")
-    @CrossOrigin(methods = {RequestMethod.POST, RequestMethod.OPTIONS}, allowedHeaders = {"Content-Type", "X-Requested-With", "accept", "Origin", "Access-Control-Request-Method", "Access-Control-Request-Headers"}, exposedHeaders = {"Access-Control-Allow-Origin", "Access-Control-Allow-Credentials"})
+//    @CrossOrigin(methods = {RequestMethod.POST, RequestMethod.OPTIONS}, allowedHeaders = {"Content-Type", "X-Requested-With", "accept", "Origin", "Access-Control-Request-Method", "Access-Control-Request-Headers"}, exposedHeaders = {"Access-Control-Allow-Origin", "Access-Control-Allow-Credentials"})
     public FileUploadResponse uploadFileUsingMultipart(
             @RequestParam("file") MultipartFile file,
             @RequestParam("fileName") String fileName,
@@ -118,6 +119,15 @@ public class FilesController {
             );
         }
         throw new UnauthorizedAccessException("Unauthorized to verify file!");
+    }
+
+    @GetMapping("/account/uploadedFiles")
+    public List<DropAndGoFile> getUploadedFilesOfUserByName(@RequestParam("username") String username, @RequestHeader("adminId") String adminId, @RequestHeader("adminPassword") String adminPassword) throws UnauthorizedAccessException {
+        if (adminService.isAdmin(adminId, adminPassword)) {
+            List<DropAndGoFile> files = filesService.getFilesByUsername(username);
+            return files;
+        }
+        throw new UnauthorizedAccessException("Unauthorized to access files!");
     }
 
     @DeleteMapping("/file/delete")

@@ -18,6 +18,7 @@ public class DropAndGoFile {
     private String path;
     private Boolean isPrivate;
     private String filePassword;
+    private Long fileSize;
     private String displayName;
     private String actualName;
     private String uploadedBy;
