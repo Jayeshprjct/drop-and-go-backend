@@ -16,7 +16,9 @@ public class WebSecurityConfiguration implements WebMvcConfigurer {
                         "http://192.168.1.107:3000",
                         "http://localhost:3000",
                         "http://127.0.0.1:5173/",
-                        "http://localhost:5173/",)
+                        "http://localhost:5173/",
+                        "http://49.248.153.214:5174"
+                        )
                 .allowedHeaders("*")
                 .exposedHeaders(
                         "Access-Control-Allow-Origin",
