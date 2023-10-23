@@ -1,0 +1,51 @@
+# Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
+# More GitHub Actions for Azure: https://github.com/Azure/actions
+
+name: Build and deploy container app to Azure Web App - backer
+
+on:
+  push:
+    branches:
+      - master
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: 'ubuntu-latest'
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v2
+
+    - name: Log in to registry
+      uses: docker/login-action@v2
+      with:
+        registry: https://mcr.microsoft.com/
+        username: ${{ secrets.AzureAppService_ContainerUsername_0f478d9bef3d49e8a4c35c2b65508108 }}
+        password: ${{ secrets.AzureAppService_ContainerPassword_4c88254e003e4f9db5f88cad259dbb9a }}
+
+    - name: Build and push container image to registry
+      uses: docker/build-push-action@v3
+      with:
+        push: true
+        tags: mcr.microsoft.com/${{ secrets.AzureAppService_ContainerUsername_0f478d9bef3d49e8a4c35c2b65508108 }}/appsvc/staticsite:${{ github.sha }}
+        file: ./Dockerfile
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+    environment:
+      name: 'production'
+      url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
+
+    steps:
+    - name: Deploy to Azure Web App
+      id: deploy-to-webapp
+      uses: azure/webapps-deploy@v2
+      with:
+        app-name: 'backer'
+        slot-name: 'production'
+        publish-profile: ${{ secrets.AzureAppService_PublishProfile_518974a91c5e4ea5872d6aa878c740c7 }}
+        images: 'mcr.microsoft.com/${{ secrets.AzureAppService_ContainerUsername_0f478d9bef3d49e8a4c35c2b65508108 }}/appsvc/staticsite:${{ github.sha }}'
